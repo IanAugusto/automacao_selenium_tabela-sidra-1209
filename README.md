@@ -17,6 +17,18 @@ Script Python automatizado para extração de dados da **Tabela 1209** do IBGE/S
 
 ---
 
+## 🌐 Multiplataforma
+
+Este script foi desenvolvido para funcionar de forma **independente do sistema operacional**, sendo compatível com:
+
+- ✅ **Windows** (7, 8, 10, 11)
+- ✅ **Linux** (Ubuntu, Debian, Fedora, etc.)
+- ✅ **macOS** (todas as versões suportadas)
+
+O código utiliza bibliotecas e métodos que garantem compatibilidade cross-platform, adaptando-se automaticamente aos diferentes sistemas operacionais. As únicas diferenças são os caminhos padrão do navegador, que podem ser facilmente configurados através de variáveis de ambiente.
+
+---
+
 ## 📦 Requisitos
 
 ### Software Necessário
@@ -122,14 +134,34 @@ python desafio_ibge_1209.py
 
 ## 📊 Resultado
 
-### Localização do Arquivo
+### Localização e Nomenclatura do Arquivo
 
 O arquivo CSV será salvo em:
 ```
-dados/populacao_60mais_1209.csv
+dados/populacao_60mais_1209_YYYYMMDD_HHMM.csv
 ```
 
 Ou na pasta definida pela variável de ambiente `SIDRA_DOWNLOAD_DIR`.
+
+**Formato do Nome do Arquivo:**
+
+O script gera automaticamente um nome de arquivo único incluindo um **timestamp** (data e hora) no formato:
+- `populacao_60mais_1209_` + `YYYYMMDD_HHMM` + `.csv`
+
+**Exemplo:**
+```
+populacao_60mais_1209_20251121_1836.csv
+```
+
+Onde:
+- `20251121` = Ano (2025) + Mês (11) + Dia (21)
+- `1836` = Hora (18) + Minuto (36)
+
+Esta nomenclatura permite:
+- ✅ **Diferenciar múltiplos downloads** realizados em momentos diferentes
+- ✅ **Manter histórico** dos arquivos baixados
+- ✅ **Evitar sobrescrita** de arquivos anteriores
+- ✅ **Facilitar organização** cronológica dos dados
 
 ### Estrutura dos Dados
 
@@ -149,7 +181,7 @@ entrevista/
 ├── requirements.txt         # Dependências Python
 ├── README.md               # Este arquivo
 └── dados/                  # Pasta de downloads (criada automaticamente)
-    └── populacao_60mais_1209.csv
+    └── populacao_60mais_1209_YYYYMMDD_HHMM.csv
 ```
 
 ---
@@ -172,6 +204,8 @@ entrevista/
 - ✅ **Download automático** sem prompts
 - ✅ **Logs informativos** durante a execução
 - ✅ **Suporte a Brave e Chrome**
+- ✅ **Multiplataforma** (Windows, Linux, macOS)
+- ✅ **Nomenclatura automática com timestamp** para evitar sobrescrita de arquivos
 
 ---
 

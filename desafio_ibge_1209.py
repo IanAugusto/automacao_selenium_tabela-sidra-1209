@@ -1,5 +1,7 @@
 import os
 import time
+import sys
+import platform
 from pathlib import Path
 
 from selenium import webdriver
@@ -13,37 +15,98 @@ from selenium.webdriver.common.action_chains import ActionChains
 from datetime import datetime 
 
 
-# ====== CONFIGURAÇÕES DE NAVEGADOR ======
+
 # Lista de possíveis caminhos (ordem de prioridade)
-BROWSERS = [
-    r"C:\Program Files\Google\Chrome\Application\chrome.exe",           # Chrome (padrão)
-    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",     # Chrome (x86)
-    r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe",  # Brave
-]
+# ====== CONFIGURAÇÕES DE NAVEGADOR (MULTI-PLATAFORMA) ======
 
-# Detecta qual navegador está instalado
-BROWSER_BINARY = None
-
-# Primeiro tenta pegar da variável de ambiente
-if os.environ.get("CHROME_BINARY"):
-    BROWSER_BINARY = os.environ.get("CHROME_BINARY")
-elif os.environ.get("BRAVE_BINARY"):
-    BROWSER_BINARY = os.environ.get("BRAVE_BINARY")
-else:
-    # Se não tem variável de ambiente, procura pelos caminhos padrão
-    for browser_path in BROWSERS:
-        if os.path.exists(browser_path):
-            BROWSER_BINARY = browser_path
-            print(f"✅ Navegador encontrado: {browser_path}")
-            break
-
-if not BROWSER_BINARY:
+def detectar_navegador():
+    """
+    Detecta automaticamente o navegador instalado no sistema.
+    Suporta: Windows, macOS, Linux
+    """
+    sistema = platform.system()
+    
+    caminhos_navegadores = {
+        "Windows": [
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe",
+            os.path.expanduser(r"~\AppData\Local\Google\Chrome\Application\chrome.exe"),
+            os.path.expanduser(r"~\AppData\Local\BraveSoftware\Brave-Browser\Application\brave.exe"),
+        ],
+        "Darwin": [  # macOS
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+            "/Applications/Chromium.app/Contents/MacOS/Chromium",
+            os.path.expanduser("~/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+        ],
+        "Linux": [
+            "/usr/bin/google-chrome",
+            "/usr/bin/google-chrome-stable",
+            "/usr/bin/chromium",
+            "/usr/bin/chromium-browser",
+            "/usr/bin/brave-browser",
+            "/usr/bin/brave",
+            "/snap/bin/chromium",
+            "/usr/local/bin/chrome",
+        ]
+    }
+    
+    # Primeiro tenta variáveis de ambiente
+    if os.environ.get("CHROME_BINARY"):
+        caminho = os.environ.get("CHROME_BINARY")
+        if os.path.exists(caminho):
+            print(f"✅ Navegador configurado via CHROME_BINARY: {caminho}")
+            return caminho
+    
+    if os.environ.get("BRAVE_BINARY"):
+        caminho = os.environ.get("BRAVE_BINARY")
+        if os.path.exists(caminho):
+            print(f"✅ Navegador configurado via BRAVE_BINARY: {caminho}")
+            return caminho
+    
+    # Detecta o sistema operacional
+    if sistema not in caminhos_navegadores:
+        raise OSError(f"❌ Sistema operacional não suportado: {sistema}")
+    
+    print(f"🔍 Detectando navegador no {sistema}...")
+    
+    # Procura pelos caminhos padrão
+    for caminho in caminhos_navegadores[sistema]:
+        if os.path.exists(caminho):
+            print(f"✅ Navegador encontrado: {caminho}")
+            return caminho
+    
+    # Linux: usa 'which' como fallback
+    if sistema == "Linux":
+        for comando in ["google-chrome", "chromium", "chromium-browser", "brave-browser"]:
+            try:
+                resultado = subprocess.run(["which", comando], capture_output=True, text=True, timeout=5)
+                if resultado.returncode == 0:
+                    caminho = resultado.stdout.strip()
+                    if caminho and os.path.exists(caminho):
+                        print(f"✅ Navegador encontrado via 'which': {caminho}")
+                        return caminho
+            except:
+                pass
+    
+    # Erro se não encontrou
     raise FileNotFoundError(
-        "❌ Nenhum navegador encontrado! Instale Google Chrome ou Brave Browser.\n"
-        "Ou configure a variável de ambiente CHROME_BINARY ou BRAVE_BINARY."
+        f"❌ Nenhum navegador compatível encontrado no {sistema}!\n\n"
+        "Instale um dos seguintes:\n"
+        "  • Google Chrome: https://www.google.com/chrome/\n"
+        "  • Brave Browser: https://brave.com/\n"
+        "  • Chromium: https://www.chromium.org/\n\n"
+        "Ou configure manualmente:\n"
+        "  Windows: set CHROME_BINARY=C:\\caminho\\chrome.exe\n"
+        "  macOS/Linux: export CHROME_BINARY=/caminho/chrome\n"
     )
 
-# Configuração de download
+
+# Detecta o navegador
+BROWSER_BINARY = detectar_navegador()
+
+# Outras configurações
 CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH")
 DOWNLOAD_DIR = Path(os.environ.get("SIDRA_DOWNLOAD_DIR", Path.cwd() / "dados"))
 
