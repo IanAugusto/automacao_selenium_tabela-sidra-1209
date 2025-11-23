@@ -49,7 +49,6 @@ O código utiliza bibliotecas e métodos que garantem compatibilidade cross-plat
 
 ```bash
 git clone <url-do-repositorio>
-cd entrevista
 ```
 
 ### 2. Crie um ambiente virtual (recomendado)
