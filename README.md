@@ -262,10 +262,6 @@ acessar_tabela_1209()          # Orquestra todo o fluxo
 **Problema:** Evitar sobrescrita em múltiplos downloads  
 **Solução:** `datetime.now().strftime("%Y%m%d_%H%M")` → `populacao_60mais_1209_20251123_0209.csv`
 
-### 7. **Conformidade 100% com Regulamento**
-**Problema:** Versão inicial tinha fallback para URL direta (❌ violava diretrizes)  
-**Solução:** Removidos todos `driver.get("tabela/1209")` → `raise RuntimeError()` em caso de erro
-
 ---
 
 ## 📊 Métricas
@@ -325,21 +321,8 @@ acessar_tabela_1209()          # Orquestra todo o fluxo
 ## 📝 Notas Adicionais
 
 - O script foi desenvolvido para funcionar com a estrutura atual do site SIDRA
-- Se o site sofrer atualizações significativas, pode ser necessário ajustar os seletores XPath/CSS
 - O script mantém o navegador aberto até você pressionar Enter para facilitar a verificação visual
 - Todos os tempos de espera são configuráveis no código
-
----
-
-## 📄 Licença
-
-Este projeto foi desenvolvido para fins de automação e extração de dados públicos do IBGE.
-
----
-
-## 👤 Autor
-
-Desenvolvido para automação de extração de dados do IBGE/SIDRA.
 
 ---
 
